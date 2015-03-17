@@ -1,0 +1,29 @@
+{
+  "name": "sickle",
+  "version": "1.0.0",
+  "description": "All purpose image resizing, caching and output for Node.JS",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marksyzm/sickle"
+  },
+  "keywords": [
+    "image",
+    "cache",
+    "resize",
+    "output"
+  ],
+  "author": "Mark Elphinstone-Hoadley",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/marksyzm/sickle/issues"
+  },
+  "homepage": "https://github.com/marksyzm/sickle",
+  "dependencies": {
+    "request": "^2.53.0",
+    "sharp": "^0.9.3"
+  }
+}
