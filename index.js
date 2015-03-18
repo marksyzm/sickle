@@ -1,24 +1,28 @@
 "use strict";
-/*
 
-var Promise = require("bluebird"),
+/*var Promise = require("bluebird"),
     gm = require("gm"),
     util = require("../util"),
     fs = require("fs"),
     path = require("path"),
     moment = require("moment"),
     request = require("request"),
-    urlLib = require("url");
+    urlLib = require("url");*/
 
-function Sickle () {
+var _ = require("lodash");
 
-}
-
-Sickle.prototype.get = function () {
-
+var defaultOptions = {
+    cacheDirectory: "../cache",
+    cacheMaxAge: 1000 * 60 * 60 * 24 * 100
 };
 
-var ref, ref1, ref2, ref3, url;
+function Sickle (options) {
+    this.options = _.extend({}, defaultOptions, options);
+}
+
+Sickle.prototype.get = function () {};
+
+/*var ref, ref1, ref2, ref3, url;
 
 var cacheTimeout = 5 * 60,
     cacheDirectory = "cache",
@@ -158,3 +162,5 @@ return fs.stat(cachePath, function(err, stat) {
             });
         });
 });*/
+
+module.exports = Sickle;
