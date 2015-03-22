@@ -38,13 +38,7 @@ module.exports = function jshint(grunt) {
                 "before"      : true,
                 "after"       : true,
                 "describe"    : true,
-                "it"          : true,
-                "angular"     : true,
-                "Notification": true,
-                "jQuery"      : false,
-                "d3"          : false,
-                "define"      : false,
-                "google"      : false
+                "it"          : true
             }
         },
         uses_defaults: [

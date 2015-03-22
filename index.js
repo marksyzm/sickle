@@ -9,18 +9,43 @@
     request = require("request"),
     urlLib = require("url");*/
 
-var _ = require("lodash");
+var _ = require("lodash"),
+    md5 = require("MD5"),
+    request = require("request");
 
 var defaultOptions = {
-    cacheDirectory: "../cache",
-    cacheMaxAge: 1000 * 60 * 60 * 24 * 100
-};
+        cacheDirectory: "../cache",
+        cacheMaxAge: 1000 * 60 * 60 * 24 * 100
+    },
+    contentTypes = [ "image/jpeg", "image/jpg", "image/png", "image/gif"],
+    userAgent = "sickle.js (ignore; Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36)";
 
 function Sickle (options) {
     this.options = _.extend({}, defaultOptions, options);
 }
 
-Sickle.prototype.get = function () {};
+Sickle.prototype.get = function (requestData, cb) {
+    /*width: requestData.width,
+     height: requestData.height,
+     crop: requestData.crop*/
+    // get the file from the URL
+    console.log(requestData.url);
+    request.get({
+        uri: requestData.url,
+        encoding: "binary",
+        headers: { "user-agent": userAgent }
+    }, function (err, response/*, data*/) {
+        //check if in range of valid content types
+        if (contentTypes.indexOf(response.headers["content-type"]) === -1) {
+            return cb(new Error("Wrong content type"), null);
+        }
+
+        console.log("RESPONSE",response.headers["content-type"]);
+        cb(null, {
+            path: "test/cache/" + md5(requestData.url)
+        });
+    });
+};
 
 /*var ref, ref1, ref2, ref3, url;
 
@@ -164,3 +189,4 @@ return fs.stat(cachePath, function(err, stat) {
 });*/
 
 module.exports = Sickle;
+

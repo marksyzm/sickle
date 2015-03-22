@@ -9,9 +9,16 @@ module.exports = function watch(grunt) {
                 "public/js/src/**/*.js",
                 "public/js/test/**/*.js",
                 "lib/**/*.js",
+                "test/**/*.js",
                 "index.js"
             ],
             tasks: ["jshint"]
+        },
+        mochacli: {
+            files: [
+                "test/**/*.js"
+            ],
+            tasks: ["mochacli:tests"]
         },
         server: {
             files: [
