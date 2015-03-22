@@ -11,41 +11,118 @@
 
 var _ = require("lodash"),
     md5 = require("MD5"),
-    request = require("request");
+    request = require("request"),
+    fs = require("fs"),
+    sharp = require("sharp"),
+    async = require("async"),
+    mkdirp = require("mkdirp"),
+    path = require("path");
 
 var defaultOptions = {
-        cacheDirectory: "../cache",
+        cacheDirectory: process.cwd() + "/cache",
         cacheMaxAge: 1000 * 60 * 60 * 24 * 100
     },
+    defaultRequestData = {
+        url: null,
+        width: 300,
+        height: 300,
+        crop: false
+    },
     contentTypes = [ "image/jpeg", "image/jpg", "image/png", "image/gif"],
-    userAgent = "sickle.js (ignore; Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36)";
+    userAgent = "Sickle.js by marksyzm (ignore; Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36)";
 
 function Sickle (options) {
     this.options = _.extend({}, defaultOptions, options);
 }
 
 Sickle.prototype.get = function (requestData, cb) {
-    /*width: requestData.width,
-     height: requestData.height,
-     crop: requestData.crop*/
+    var self = this;
+    requestData = _.extend({}, defaultRequestData, requestData);
+
     // get the file from the URL
-    console.log(requestData.url);
     request.get({
         uri: requestData.url,
-        encoding: "binary",
+        encoding: "base64",
         headers: { "user-agent": userAgent }
-    }, function (err, response/*, data*/) {
+    }, function (err, response, data) {
         //check if in range of valid content types
         if (contentTypes.indexOf(response.headers["content-type"]) === -1) {
             return cb(new Error("Wrong content type"), null);
         }
 
-        console.log("RESPONSE",response.headers["content-type"]);
-        cb(null, {
-            path: "test/cache/" + md5(requestData.url)
+        getImageData(requestData.url, data, requestData, self.options, function (err, imageData) {
+            if (err) { return cb(err, null); }
+            cb(null, imageData);
         });
     });
 };
+
+function getImageData (url, data, requestData, options, cb) {
+    var filePath = getFilePath(url, requestData, options);
+
+    async.series([
+        function (callback) {
+            mkdirp(path.dirname(filePath), function (err) {
+                if (err) { cb(err, null); }
+                callback(err);
+            });
+        },
+        function (callback) {
+            fs.stat(filePath, function (err, stat) {
+                if (err || !stat.fileExists()) {
+                    resizeImage ( data, requestData, filePath, function (err/*, imageData*/) {
+                        if (err) {
+                            cb(err, null);
+                            return callback(err);
+                        }
+                        cb(null, { filePath: filePath });
+                        callback(null);
+                    });
+                    return;
+                }
+                cb(null, { filePath: filePath });
+                callback(null);
+            });
+        }
+    ]);
+}
+
+function resizeImage (data, requestData, filePath, cb) {
+    var imageResize = sharp(new Buffer(data, "base64"))
+        .metadata(function (err, metadata) {
+            if (err) { return cb(err, null); }
+
+            var width,
+                height;
+
+            if (requestData.crop) {
+                width = requestData.width;
+                height = requestData.height;
+            } else {
+                if (metadata.height > metadata.width) {
+                    height = requestData.height;
+                } else {
+                    width = requestData.width;
+                }
+            }
+
+            imageResize
+                .resize(width, height)
+                .toFile(filePath, function(err) {
+                    if (err) { return cb(err, null); }
+                    cb(null, {
+                        filePath: filePath
+                    });
+                });
+        });
+}
+
+function getFilePath (url, requestData, options) {
+    var cacheSubDirectory = requestData.width + "-" + requestData.height;
+    cacheSubDirectory += requestData.crop ? "-crop" : "-nocrop";
+
+    return options.cacheDirectory + "/" + cacheSubDirectory + "/" + md5(url);
+}
 
 /*var ref, ref1, ref2, ref3, url;
 

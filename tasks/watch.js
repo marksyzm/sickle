@@ -3,34 +3,22 @@
 module.exports = function watch(grunt) {
 	grunt.loadNpmTasks("grunt-contrib-watch");
 
+    var files = [
+        "public/js/src/**/*.js",
+        "public/js/test/**/*.js",
+        "lib/**/*.js",
+        "test/**/*.js",
+        "index.js"
+    ];
+
 	return {
         jshint: {
-            files: [
-                "public/js/src/**/*.js",
-                "public/js/test/**/*.js",
-                "lib/**/*.js",
-                "test/**/*.js",
-                "index.js"
-            ],
+            files: files,
             tasks: ["jshint"]
         },
         mochacli: {
-            files: [
-                "test/**/*.js"
-            ],
+            files: files,
             tasks: ["mochacli:tests"]
-        },
-        server: {
-            files: [
-                "index.js",
-                "app/**"
-            ],
-            options: {
-                autoreload: true,
-                ignore: [
-                    "node_modules/**/*.js"
-                ]
-            }
         }
     };
 };

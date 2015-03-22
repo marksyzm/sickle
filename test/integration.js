@@ -1,16 +1,21 @@
 "use strict";
 
+var expect = require("chai").expect,
+    md5 = require("MD5");
+
 var Sickle = require("../"),
-    expect = require("chai").expect,
     support = require("./support");
 
 describe("Sickle", function () {
-    var testServer,
+    var cachePath = process.cwd() + "/test/cache",
+        testServer,
         sickle;
 
     before(function (done) {
         testServer = support.getServer();
-        sickle = new Sickle({ cacheDirectory: "./test/cache" });
+        sickle = new Sickle({ cacheDirectory: cachePath });
+        support.clearDirectory("./test/cache", [ ".gitignore" ]);
+
         done();
     });
 
@@ -30,27 +35,35 @@ describe("Sickle", function () {
 
     describe("when requesting a real resized image", function () {
         it("should cache file and return a resized image from a remote source", function (done) {
-            sickle.get({ url: "http://localhost:"+support.port+"/test.png" }, function (err, imageData) {
-                expect(imageData).to.be.an("object");
+
+            var url = "http://localhost:"+support.port+"/test.jpg",
+                expectedPath = cachePath + "/300-300-nocrop/" + md5(url);
+
+            expect(support.fileExists(expectedPath)).to.be.false;
+
+            sickle.get({ url: url }, function (err, imageData) {
                 expect(err).to.be.null;
+                expect(imageData).to.be.an("object");
+
                 // check cache exists based on returned image
-                expect(imageData.path).to.be.a("string");
-                // expect(fs.existsSync(imageData.path)).to.be.true;
-                // check cached image contains the correct dimensions
+                expect(imageData.filePath).to.equal(expectedPath);
+                expect(support.fileExists(imageData.filePath)).to.be.true;
+
+                // check cached image contains the correct dimensions compared to the data
 
                 done();
             });
         });
 
-        it("should get cached file and return a resized image from a remote source", function () {
+        it.skip("should get cached file and return a resized image from a remote source", function () {
 
         });
 
-        it("should cache file and return a resized image from a local source", function () {
+        it.skip("should cache file and return a resized image from a local source", function () {
 
         });
 
-        it("should get cached file and return a resized image from a local source", function () {
+        it.skip("should get cached file and return a resized image from a local source", function () {
 
         });
     });
