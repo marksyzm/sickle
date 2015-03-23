@@ -24,7 +24,7 @@ describe("Sickle", function () {
 
         });
 
-        it("should return error on wrong content type", function () {
+        it.skip("should return error on wrong content type", function () {
             sickle.get({ url: "http://localhost:"+support.port+"/content-type-invalid" }, function (err, imageData) {
                 expect(err).to.be.an("object");
                 expect(err.message).to.equal("Wrong content type");
@@ -35,8 +35,7 @@ describe("Sickle", function () {
 
     describe("when requesting a real resized image", function () {
         it("should cache file and return a resized image from a remote source", function (done) {
-
-            var url = "http://localhost:"+support.port+"/test.jpg",
+            var url = "http://localhost:"+support.port+"/test.png",
                 expectedPath = cachePath + "/300-300-nocrop/" + md5(url);
 
             expect(support.fileExists(expectedPath)).to.be.false;
@@ -49,14 +48,42 @@ describe("Sickle", function () {
                 expect(imageData.filePath).to.equal(expectedPath);
                 expect(support.fileExists(imageData.filePath)).to.be.true;
 
-                // check cached image contains the correct dimensions compared to the data
+                // check file data
+                expect(imageData.data).to.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
+
+                // check image contains the correct dimensions compared to the data
+                expect(imageData.width).to.be.at.most(300);
+                expect(imageData.height).to.be.at.most(300);
+                expect(imageData.format).to.equal("png");
 
                 done();
             });
         });
 
-        it.skip("should get cached file and return a resized image from a remote source", function () {
+        it("should get cached file and return a resized image from a remote source", function () {
+            var url = "http://localhost:"+support.port+"/test.png",
+                expectedPath = cachePath + "/300-300-nocrop/" + md5(url);
 
+            expect(support.fileExists(expectedPath)).to.be.true;
+
+            sickle.get({ url: url }, function (err, imageData) {
+                expect(err).to.be.null;
+                expect(imageData).to.be.an("object");
+
+                // check cache exists based on returned image
+                expect(imageData.filePath).to.equal(expectedPath);
+                expect(support.fileExists(imageData.filePath)).to.be.true;
+
+                // check file data
+                expect(imageData.data).to.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
+
+                // check image contains the correct dimensions compared to the data
+                expect(imageData.width).to.be.at.most(300);
+                expect(imageData.height).to.be.at.most(300);
+                expect(imageData.format).to.equal("png");
+
+                done();
+            });
         });
 
         it.skip("should cache file and return a resized image from a local source", function () {

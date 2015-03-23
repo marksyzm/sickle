@@ -4,7 +4,7 @@
   "description": "All purpose image resizing, caching and output for Node.JS",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test",
+    "test": "grunt test-cov",
     "watch": "grunt dev"
   },
   "repository": {
