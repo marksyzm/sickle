@@ -10,8 +10,8 @@ var _ = require("lodash"),
     path = require("path");
 
 var defaultOptions = {
-        cacheDirectory: process.cwd() + "/cache",
-        cacheMaxAge: 1000 * 60 * 60 * 24 * 100
+        cacheDirectory: process.cwd() + "/cache"/*,
+        cacheMaxAge: 1000 * 60 * 60 * 24 * 100*/
     },
     defaultRequestData = {
         url: null,
@@ -19,7 +19,7 @@ var defaultOptions = {
         height: 300,
         crop: false
     },
-    contentTypes = [ "image/jpeg", "image/jpg", "image/png", "image/gif"],
+    contentTypes = [ "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"],
     userAgent = "Sickle.js by marksyzm (ignore; Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36)";
 
 function Sickle (options) {
@@ -56,9 +56,16 @@ function getRemoteImage (requestData, filePath, cb) {
         encoding: "base64",
         headers: { "user-agent": userAgent }
     }, function (err, response, data) {
-        //check if in range of valid content types
+        if (err) { return cb(new Error("Broken request")); }
+        // check status codes
+        if ([200,301,302].indexOf(response.statusCode) === -1) { return cb(new Error("Broken URL")); }
+        // check if in range of valid content types
         if (contentTypes.indexOf(response.headers["content-type"]) === -1) {
             return cb(new Error("Wrong content type"), null);
+        }
+        // check if data exists or is valid
+        if (!data || !data.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/)) {
+            return cb(new Error("No data"), null);
         }
 
         getImageData(data, requestData, filePath, false, function (err, imageData) {
@@ -134,7 +141,11 @@ function getImageMetadataAndBuffer (filePath, cb) {
                     return asyncCallback(err);
                 }
 
-                image.toBuffer().then(function (outputBuffer) {
+                image.toBuffer(function (err, outputBuffer) {
+                    if (err) {
+                        cb(err, null);
+                        return asyncCallback(err);
+                    }
                     cb(null, _.extend({}, metadata, {
                         data: outputBuffer.toString("base64"),
                         filePath: filePath

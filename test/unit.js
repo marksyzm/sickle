@@ -13,8 +13,8 @@ describe("Sickle", function () {
             expect(sickle.options).to.be.an("object");
             expect(sickle.options.cacheDirectory).to.be.a("string");
 
-            expect(sickle.options.cacheMaxAge).to.be.a("number");
-            expect(sickle.options.cacheMaxAge).to.be.at.least(-1);
+            /*expect(sickle.options.cacheMaxAge).to.be.a("number");
+            expect(sickle.options.cacheMaxAge).to.be.at.least(-1);*/
 
             expect(sickle.get).to.be.a("function");
         });

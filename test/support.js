@@ -79,6 +79,12 @@ function server (req, res) {
         });
         res.end(png, "binary");
     }
+    else if (path === "/test-empty.png") {
+        res.writeHead(200, {
+            "Content-Type": "image/png"
+        });
+        res.end();
+    }
     else if (path === "/test.gif") {
         res.writeHead(200, {
             "Content-Type": "image/gif"
