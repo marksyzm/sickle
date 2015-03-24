@@ -4,7 +4,7 @@ var _ = require("lodash"),
     md5 = require("MD5"),
     request = require("request"),
     fs = require("fs"),
-    sharp = require("sharp"),
+    gm = require("gm"),
     async = require("async"),
     mkdirp = require("mkdirp"),
     path = require("path");
@@ -14,10 +14,7 @@ var defaultOptions = {
         cacheMaxAge: 1000 * 60 * 60 * 24 * 100*/
     },
     defaultRequestData = {
-        url: null,
-        width: 300,
-        height: 300,
-        crop: false
+        url: null, width: 300, height: 300, crop: false
     },
     contentTypes = [ "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"],
     userAgent = "Sickle.js by marksyzm (ignore; Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36)";
@@ -41,7 +38,7 @@ Sickle.prototype.get = function (requestData, cb) {
         }
 
         fs.readFile(filePath, function (err, data) {
-            getImageData(new Buffer(data).toString("base64"), requestData, filePath, true, function (err, imageData) {
+            getImageData(data, requestData, filePath, true, function (err, imageData) {
                 if (err) { return cb(err, null); }
                 cb(null, imageData);
             });
@@ -52,9 +49,7 @@ Sickle.prototype.get = function (requestData, cb) {
 function getRemoteImage (requestData, filePath, cb) {
     // get the file from the URL
     request.get({
-        uri: requestData.url,
-        encoding: "base64",
-        headers: { "user-agent": userAgent }
+        uri: requestData.url, encoding: null, headers: { "user-agent": userAgent }
     }, function (err, response, data) {
         if (err) { return cb(new Error("Broken request")); }
         // check status codes
@@ -64,7 +59,7 @@ function getRemoteImage (requestData, filePath, cb) {
             return cb(new Error("Wrong content type"), null);
         }
         // check if data exists or is valid
-        if (!data || !data.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/)) {
+        if (!data || !data.toString("base64").match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)$/)) {
             return cb(new Error("No data"), null);
         }
 
@@ -103,51 +98,42 @@ function createDirectory (filePath, cb) {
 
 function resizeImage (filePath, requestData, data, cb) {
     return function (asyncCallback) {
-        var imageResize = sharp(new Buffer(data, "base64"))
-            .metadata(function (err, metadata) {
-                if (err) {
-                    cb(err);
-                    return asyncCallback(null);
-                }
+        gm(data)
+            .identify({ bufferStream: true }, function (err, metadata) {
+                if (err) { return (err), asyncCallback(null); }
 
                 var width, height;
 
                 if (requestData.crop) {
                     width = requestData.width;
                     height = requestData.height;
+                    this.resize(width, height, "^").gravity("Center").crop(width, height);
                 } else if (metadata.height > metadata.width) {
                     height = requestData.height;
                 } else {
                     width = requestData.width;
                 }
 
-                imageResize
-                    .resize(width, height)
-                    .withMetadata()
-                    .toFile(filePath, function (err) {
-                        if (err) { cb(err); }
-                        asyncCallback(null);
-                    });
+                if (!requestData.crop) { this.resize(width, height); }
+
+                this.write(filePath, function (err) {
+                    if (err) { cb(err); }
+                    asyncCallback(null);
+                });
             });
     };
 }
 
 function getImageMetadataAndBuffer (filePath, cb) {
     return function (asyncCallback) {
-        var image = sharp(filePath)
-            .metadata(function (err, metadata) {
-                if (err) {
-                    cb(err, null);
-                    return asyncCallback(err);
-                }
+        gm(filePath)
+            .identify(function (err, metadata) {
+                if (err) {return cb(err, null), asyncCallback(err);}
 
-                image.toBuffer(function (err, outputBuffer) {
-                    if (err) {
-                        cb(err, null);
-                        return asyncCallback(err);
-                    }
+                this.toBuffer(function (err, outputBuffer) {
+                    if (err) { return cb(err, null), asyncCallback(err);}
                     cb(null, _.extend({}, metadata, {
-                        data: outputBuffer.toString("base64"),
+                        data: outputBuffer,
                         filePath: filePath
                     }));
                     asyncCallback(null);
@@ -165,4 +151,3 @@ function getFilePath (requestData, options) {
 }
 
 module.exports = Sickle;
-

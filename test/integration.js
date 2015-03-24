@@ -9,7 +9,8 @@ var Sickle = require("../"),
 describe("Sickle", function () {
     var cachePath = process.cwd() + "/test/cache",
         testServer,
-        sickle;
+        sickle,
+        base64RegEx = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
     before(function (done) {
         testServer = support.getServer();
@@ -36,7 +37,7 @@ describe("Sickle", function () {
             });
         });
 
-        it("should contain data", function () {
+        it("should not contain data", function () {
             sickle.get({ url: "http://localhost:"+support.port+"/test-empty.png" }, function (err, imageData) {
                 expect(err).to.be.an("object");
                 expect(err.message).to.equal("No data");
@@ -61,12 +62,14 @@ describe("Sickle", function () {
                 expect(support.fileExists(imageData.filePath)).to.be.true;
 
                 // check file data
-                expect(imageData.data).to.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
+                expect(imageData.data).to.be.instanceOf(Buffer);
+                expect(imageData.data.toString("base64")).to.match(base64RegEx);
 
                 // check image contains the correct dimensions compared to the data
-                expect(imageData.width).to.be.at.most(300);
-                expect(imageData.height).to.be.at.most(300);
-                expect(imageData.format).to.equal("png");
+                console.log(imageData);
+                expect(imageData.size.width).to.be.at.most(300);
+                expect(imageData.size.height).to.be.at.most(300);
+                expect(imageData.format).to.equal("PNG");
 
                 done();
             });
@@ -83,9 +86,10 @@ describe("Sickle", function () {
                 expect(imageData).to.be.an("object");
                 expect(imageData.filePath).to.equal(expectedPath);
                 expect(support.fileExists(imageData.filePath)).to.be.true;
-                expect(imageData.data).to.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
-                expect(imageData.width).to.be.at.most(300);
-                expect(imageData.height).to.be.at.most(300);
+                expect(imageData.data).to.be.instanceOf(Buffer);
+                expect(imageData.data.toString("base64")).to.match(base64RegEx);
+                expect(imageData.size.width).to.be.at.most(300);
+                expect(imageData.size.height).to.be.at.most(300);
                 expect(imageData.format).to.equal("png");
 
                 done();
@@ -103,11 +107,10 @@ describe("Sickle", function () {
                 expect(imageData).to.be.an("object");
                 expect(imageData.filePath).to.equal(expectedPath);
                 expect(support.fileExists(imageData.filePath)).to.be.true;
-                expect(imageData.data).to.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
-                expect(imageData.width).to.be.at.most(300);
-                expect(imageData.height).to.be.at.most(300);
+                expect(imageData.data.toString("base64")).to.match(base64RegEx);
+                expect(imageData.size.width).to.be.at.most(300);
+                expect(imageData.size.height).to.be.at.most(300);
                 expect(imageData.format).to.equal("gif");
-
 
                 done();
             });
@@ -124,9 +127,10 @@ describe("Sickle", function () {
                 expect(imageData).to.be.an("object");
                 expect(imageData.filePath).to.equal(expectedPath);
                 expect(support.fileExists(imageData.filePath)).to.be.true;
-                expect(imageData.data).to.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
-                expect(imageData.width).to.be.at.most(300);
-                expect(imageData.height).to.be.at.most(300);
+                expect(imageData.data).to.be.instanceOf(Buffer);
+                expect(imageData.data.toString("base64")).to.match(base64RegEx);
+                expect(imageData.size.width).to.be.at.most(300);
+                expect(imageData.size.height).to.be.at.most(300);
                 expect(imageData.format).to.equal("jpeg");
 
                 done();
