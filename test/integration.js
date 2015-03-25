@@ -9,12 +9,12 @@ var Sickle = require("../"),
 describe("Sickle", function () {
     var cachePath = process.cwd() + "/test/cache",
         testServer,
-        sickle,
-        base64RegEx = /(([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?){1}/;
+        sickle;
 
     before(function (done) {
         testServer = support.getServer();
         sickle = new Sickle({ cacheDirectory: cachePath });
+        support.clearDirectory("./test/cache", [ ".gitignore" ]);
         done();
     });
 
@@ -61,7 +61,7 @@ describe("Sickle", function () {
 
                 // check file data
                 expect(imageData.data).to.be.instanceOf(Buffer);
-                expect(imageData.data.toString("base64")).to.match(base64RegEx);
+                expect(!!imageData.data.toString("base64")).to.be.true;
 
                 // check image contains the correct dimensions compared to the data
                 expect(imageData.size.width).to.be.at.most(300);
@@ -84,7 +84,7 @@ describe("Sickle", function () {
                 expect(imageData.path).to.equal(expectedPath);
                 expect(support.fileExists(imageData.path)).to.be.true;
                 expect(imageData.data).to.be.instanceOf(Buffer);
-                expect(imageData.data.toString("base64")).to.match(base64RegEx);
+                expect(!!imageData.data.toString("base64")).to.be.true;
                 expect(imageData.size.width).to.be.at.most(300);
                 expect(imageData.size.height).to.be.at.most(300);
                 expect(imageData.format).to.equal("PNG");
@@ -104,7 +104,7 @@ describe("Sickle", function () {
                 expect(imageData).to.be.an("object");
                 expect(imageData.path).to.equal(expectedPath);
                 expect(support.fileExists(imageData.path)).to.be.true;
-                expect(imageData.data.toString("base64")).to.match(base64RegEx);
+                expect(!!imageData.data.toString("base64")).to.be.true;
                 expect(imageData.size.width).to.be.at.most(300);
                 expect(imageData.size.height).to.be.at.most(300);
 
@@ -126,7 +126,7 @@ describe("Sickle", function () {
                 expect(imageData.path).to.equal(expectedPath);
                 expect(support.fileExists(imageData.path)).to.be.true;
                 expect(imageData.data).to.be.instanceOf(Buffer);
-                expect(imageData.data.toString("base64")).to.match(base64RegEx);
+                expect(!!imageData.data.toString("base64")).to.be.true;
                 expect(imageData.size.width).to.be.at.most(300);
                 expect(imageData.size.height).to.be.at.most(300);
                 expect(imageData.format).to.equal("JPEG");
@@ -147,7 +147,7 @@ describe("Sickle", function () {
                 expect(imageData.path).to.equal(expectedPath);
                 expect(support.fileExists(imageData.path)).to.be.true;
                 expect(imageData.data).to.be.instanceOf(Buffer);
-                expect(imageData.data.toString("base64")).to.match(base64RegEx);
+                expect(!!imageData.data.toString("base64")).to.be.true;
                 expect(imageData.size.width).to.equal(300);
                 expect(imageData.size.height).to.equal(300);
                 expect(imageData.format).to.equal("JPEG");
