@@ -59,7 +59,7 @@ function getRemoteImage (requestData, filePath, cb) {
             return cb(new Error("Wrong content type"), null);
         }
         // check if data exists or is valid
-        if (!data || !data.toString("base64").match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)$/)) {
+        if (!data || !data.toString("base64").match(/(([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?){1}/)) {
             return cb(new Error("No data"), null);
         }
 
@@ -99,7 +99,7 @@ function createDirectory (filePath, cb) {
 function resizeImage (filePath, requestData, data, cb) {
     return function (asyncCallback) {
         gm(data)
-            .identify({ bufferStream: true }, function (err, metadata) {
+            .identify(function (err, metadata) {
                 if (err) { return (err), asyncCallback(null); }
 
                 var width, height;

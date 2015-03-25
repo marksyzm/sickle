@@ -10,7 +10,7 @@ describe("Sickle", function () {
     var cachePath = process.cwd() + "/test/cache",
         testServer,
         sickle,
-        base64RegEx = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+        base64RegEx = /(([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?){1}/;
 
     before(function (done) {
         testServer = support.getServer();
