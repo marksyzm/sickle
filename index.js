@@ -59,7 +59,7 @@ function getRemoteImage (requestData, filePath, cb) {
             return cb(new Error("Wrong content type"), null);
         }
         // check if data exists or is valid
-        if (!data || !data.toString("base64").match(/(([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?){1}/)) {
+        if (!data || !data.toString("base64")) {
             return cb(new Error("No data"), null);
         }
 
