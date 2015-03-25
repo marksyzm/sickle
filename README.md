@@ -1,4 +1,4 @@
-[logo]: https://github.com/marksyzm/sickle/raw/master/src/design/sickle.png "Sickle"
+[logo]: https://raw.githubusercontent.com/marksyzm/sickle/master/design/sickle.png "Sickle"
 
 All purpose image proxy for resizing, caching and output.
 
