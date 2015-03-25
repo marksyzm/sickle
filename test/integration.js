@@ -58,8 +58,8 @@ describe("Sickle", function () {
                 expect(imageData).to.be.an("object");
 
                 // check cache exists based on returned image
-                expect(imageData.filePath).to.equal(expectedPath);
-                expect(support.fileExists(imageData.filePath)).to.be.true;
+                expect(imageData.path).to.equal(expectedPath);
+                expect(support.fileExists(imageData.path)).to.be.true;
 
                 // check file data
                 expect(imageData.data).to.be.instanceOf(Buffer);
@@ -83,8 +83,8 @@ describe("Sickle", function () {
             sickle.get({ url: url }, function (err, imageData) {
                 expect(err).to.be.null;
                 expect(imageData).to.be.an("object");
-                expect(imageData.filePath).to.equal(expectedPath);
-                expect(support.fileExists(imageData.filePath)).to.be.true;
+                expect(imageData.path).to.equal(expectedPath);
+                expect(support.fileExists(imageData.path)).to.be.true;
                 expect(imageData.data).to.be.instanceOf(Buffer);
                 expect(imageData.data.toString("base64")).to.match(base64RegEx);
                 expect(imageData.size.width).to.be.at.most(300);
@@ -104,8 +104,8 @@ describe("Sickle", function () {
             sickle.get({ url: url }, function (err, imageData) {
                 expect(err).to.be.null;
                 expect(imageData).to.be.an("object");
-                expect(imageData.filePath).to.equal(expectedPath);
-                expect(support.fileExists(imageData.filePath)).to.be.true;
+                expect(imageData.path).to.equal(expectedPath);
+                expect(support.fileExists(imageData.path)).to.be.true;
                 expect(imageData.data.toString("base64")).to.match(base64RegEx);
                 expect(imageData.size.width).to.be.at.most(300);
                 expect(imageData.size.height).to.be.at.most(300);
@@ -125,8 +125,8 @@ describe("Sickle", function () {
             sickle.get({ url: url }, function (err, imageData) {
                 expect(err).to.be.null;
                 expect(imageData).to.be.an("object");
-                expect(imageData.filePath).to.equal(expectedPath);
-                expect(support.fileExists(imageData.filePath)).to.be.true;
+                expect(imageData.path).to.equal(expectedPath);
+                expect(support.fileExists(imageData.path)).to.be.true;
                 expect(imageData.data).to.be.instanceOf(Buffer);
                 expect(imageData.data.toString("base64")).to.match(base64RegEx);
                 expect(imageData.size.width).to.be.at.most(300);
@@ -146,8 +146,8 @@ describe("Sickle", function () {
             sickle.get({ url: url, crop: true }, function (err, imageData) {
                 expect(err).to.be.null;
                 expect(imageData).to.be.an("object");
-                expect(imageData.filePath).to.equal(expectedPath);
-                expect(support.fileExists(imageData.filePath)).to.be.true;
+                expect(imageData.path).to.equal(expectedPath);
+                expect(support.fileExists(imageData.path)).to.be.true;
                 expect(imageData.data).to.be.instanceOf(Buffer);
                 expect(imageData.data.toString("base64")).to.match(base64RegEx);
                 expect(imageData.size.width).to.equal(300);

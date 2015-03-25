@@ -133,8 +133,7 @@ function getImageMetadataAndBuffer (filePath, cb) {
                 this.toBuffer(function (err, outputBuffer) {
                     if (err) { return cb(err, null), asyncCallback(err);}
                     cb(null, _.extend({}, metadata, {
-                        data: outputBuffer,
-                        filePath: filePath
+                        data: outputBuffer
                     }));
                     asyncCallback(null);
                 });
