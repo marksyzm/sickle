@@ -1,6 +1,6 @@
 {
   "name": "sickle",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "All purpose image resizing, caching and output for Node.JS",
   "main": "index.js",
   "scripts": {
