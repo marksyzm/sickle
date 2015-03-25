@@ -1,5 +1,7 @@
 <img src="https://raw.githubusercontent.com/marksyzm/sickle/master/design/sickle.png" alt="Sickle" />
 
+[![Build Status](https://travis-ci.org/marksyzm/sickle.svg?branch=master)](https://travis-ci.org/marksyzm/sickle)
+
 All purpose image proxy for resizing, caching and output.
 
 Sickle.js is pretty simple - you set it up to store your files in a cache directory...
