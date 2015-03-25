@@ -26,3 +26,6 @@ node_modules
 
 # Cache directories
 cache/
+
+# IDE stuff
+.idea/
