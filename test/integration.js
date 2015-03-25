@@ -15,8 +15,6 @@ describe("Sickle", function () {
     before(function (done) {
         testServer = support.getServer();
         sickle = new Sickle({ cacheDirectory: cachePath });
-        support.clearDirectory("./test/cache", [ ".gitignore" ]);
-
         done();
     });
 
@@ -160,6 +158,7 @@ describe("Sickle", function () {
     });
 
     after(function(done){
+        support.clearDirectory("./test/cache", [ ".gitignore" ]);
         testServer.close(function () {
             done();
         });
