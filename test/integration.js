@@ -66,7 +66,6 @@ describe("Sickle", function () {
                 expect(imageData.data.toString("base64")).to.match(base64RegEx);
 
                 // check image contains the correct dimensions compared to the data
-                console.log(imageData);
                 expect(imageData.size.width).to.be.at.most(300);
                 expect(imageData.size.height).to.be.at.most(300);
                 expect(imageData.format).to.equal("PNG");
@@ -75,7 +74,7 @@ describe("Sickle", function () {
             });
         });
 
-        it("should get cached file and return a resized image from a remote source", function () {
+        it("should get cached file and return a resized image from a remote source", function (done) {
             var url = "http://localhost:"+support.port+"/test.png",
                 expectedPath = cachePath + "/300-300-nocrop/" + md5(url);
 
@@ -90,13 +89,13 @@ describe("Sickle", function () {
                 expect(imageData.data.toString("base64")).to.match(base64RegEx);
                 expect(imageData.size.width).to.be.at.most(300);
                 expect(imageData.size.height).to.be.at.most(300);
-                expect(imageData.format).to.equal("png");
+                expect(imageData.format).to.equal("PNG");
 
                 done();
             });
         });
 
-        it.skip("should work with a GIF", function () {
+        it("should work with a gif", function (done) {
             var url = "http://localhost:"+support.port+"/test.gif",
                 expectedPath = cachePath + "/300-300-nocrop/" + md5(url);
 
@@ -110,13 +109,14 @@ describe("Sickle", function () {
                 expect(imageData.data.toString("base64")).to.match(base64RegEx);
                 expect(imageData.size.width).to.be.at.most(300);
                 expect(imageData.size.height).to.be.at.most(300);
-                expect(imageData.format).to.equal("gif");
+
+                expect(imageData.format).to.equal("GIF");
 
                 done();
             });
         });
 
-        it.skip("should work with a jpg", function () {
+        it("should work with a jpg", function (done) {
             var url = "http://localhost:"+support.port+"/test.jpg",
                 expectedPath = cachePath + "/300-300-nocrop/" + md5(url);
 
@@ -131,7 +131,28 @@ describe("Sickle", function () {
                 expect(imageData.data.toString("base64")).to.match(base64RegEx);
                 expect(imageData.size.width).to.be.at.most(300);
                 expect(imageData.size.height).to.be.at.most(300);
-                expect(imageData.format).to.equal("jpeg");
+                expect(imageData.format).to.equal("JPEG");
+
+                done();
+            });
+        });
+
+        it("should crop and match dimensions", function (done) {
+            var url = "http://localhost:"+support.port+"/test.jpg",
+                expectedPath = cachePath + "/300-300-crop/" + md5(url);
+
+            expect(support.fileExists(expectedPath)).to.be.false;
+
+            sickle.get({ url: url, crop: true }, function (err, imageData) {
+                expect(err).to.be.null;
+                expect(imageData).to.be.an("object");
+                expect(imageData.filePath).to.equal(expectedPath);
+                expect(support.fileExists(imageData.filePath)).to.be.true;
+                expect(imageData.data).to.be.instanceOf(Buffer);
+                expect(imageData.data.toString("base64")).to.match(base64RegEx);
+                expect(imageData.size.width).to.equal(300);
+                expect(imageData.size.height).to.equal(300);
+                expect(imageData.format).to.equal("JPEG");
 
                 done();
             });
