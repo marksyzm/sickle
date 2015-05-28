@@ -15,6 +15,7 @@
     "image",
     "cache",
     "resize",
+    "proxy",
     "output"
   ],
   "author": "Mark Elphinstone-Hoadley",

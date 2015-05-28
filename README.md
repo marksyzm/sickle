@@ -1,6 +1,7 @@
 <img src="https://raw.githubusercontent.com/marksyzm/sickle/master/design/sickle.png" alt="Sickle" />
 
 [![Build Status](https://travis-ci.org/marksyzm/sickle.svg?branch=master)](https://travis-ci.org/marksyzm/sickle)
+[![npm version](https://badge.fury.io/js/sickle@2x.png)](http://badge.fury.io/js/sickle)
 
 All purpose image proxy for resizing, caching and output.
 
