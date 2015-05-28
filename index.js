@@ -10,8 +10,10 @@ var _ = require("lodash"),
     path = require("path");
 
 var defaultOptions = {
+        scaleUp: false,
+        quality: 90,
         cacheDirectory: process.cwd() + "/cache"/*,
-        cacheMaxAge: 1000 * 60 * 60 * 24 * 100*/
+         cacheMaxAge: 1000 * 60 * 60 * 24 * 100*/
     },
     defaultRequestData = {
         url: null, width: 300, height: 300, crop: false
@@ -27,10 +29,11 @@ Sickle.prototype.get = function (requestData, cb) {
     requestData = _.extend({}, defaultRequestData, requestData);
 
     var filePath = getFilePath(requestData, this.options);
+    var options = this.options;
 
     fs.stat(filePath, function (err) {
         if (err) {
-            getRemoteImage(requestData, filePath, function (err, imageData) {
+            getRemoteImage(requestData, filePath, options, function (err, imageData) {
                 if (err) { return cb(err, null); }
                 cb(null, imageData);
             });
@@ -38,7 +41,7 @@ Sickle.prototype.get = function (requestData, cb) {
         }
 
         fs.readFile(filePath, function (err, data) {
-            getImageData(data, requestData, filePath, true, function (err, imageData) {
+            getImageData(data, requestData, filePath, true, options, function (err, imageData) {
                 if (err) { return cb(err, null); }
                 cb(null, imageData);
             });
@@ -46,7 +49,7 @@ Sickle.prototype.get = function (requestData, cb) {
     });
 };
 
-function getRemoteImage (requestData, filePath, cb) {
+function getRemoteImage (requestData, filePath, options, cb) {
     // get the file from the URL
     request.get({
         uri: requestData.url, encoding: null, headers: { "user-agent": userAgent }
@@ -63,14 +66,14 @@ function getRemoteImage (requestData, filePath, cb) {
             return cb(new Error("No data"), null);
         }
 
-        getImageData(data, requestData, filePath, false, function (err, imageData) {
+        getImageData(data, requestData, filePath, false, options, function (err, imageData) {
             if (err) { return cb(err, null); }
             cb(null, imageData);
         });
     });
 }
 
-function getImageData (data, requestData, filePath, isCached, cb) {
+function getImageData (data, requestData, filePath, isCached, options, cb) {
     var seriesCalls;
     if (isCached) {
         seriesCalls = [
@@ -79,7 +82,7 @@ function getImageData (data, requestData, filePath, isCached, cb) {
     } else {
         seriesCalls = [
             createDirectory(filePath, cb),
-            resizeImage(filePath, requestData, data, cb),
+            resizeImage(filePath, requestData, data, options, cb),
             getImageMetadataAndBuffer(filePath, cb)
         ];
     }
@@ -96,25 +99,31 @@ function createDirectory (filePath, cb) {
     };
 }
 
-function resizeImage (filePath, requestData, data, cb) {
+function resizeImage (filePath, requestData, data, options, cb) {
     return function (asyncCallback) {
         gm(data)
             .identify(function (err, metadata) {
                 if (err) { return (err), asyncCallback(null); }
 
                 var width, height;
+                var size = metadata.size;
 
-                if (requestData.crop) {
-                    width = requestData.width;
-                    height = requestData.height;
-                    this.resize(width, height, "^").gravity("Center").crop(width, height);
-                } else if (metadata.height > metadata.width) {
-                    height = requestData.height;
-                } else {
-                    width = requestData.width;
+                if (options.scaleUp || (!options.scaleUp && ( size.width > requestData.width || size.height > requestData.height))) {
+                    this.quality(options.quality);
+                    if (requestData.crop) {
+                        width = requestData.width;
+                        height = requestData.height;
+                        this.resize(width, height, "^").gravity("Center").crop(width, height);
+                    } else if (size.height > size.width) {
+                        height = requestData.height;
+                    } else {
+                        width = requestData.width;
+                    }
+
+                    if (!requestData.crop) {
+                        this.resize(width, height);
+                    }
                 }
-
-                if (!requestData.crop) { this.resize(width, height); }
 
                 this.write(filePath, function (err) {
                     if (err) { cb(err); }
