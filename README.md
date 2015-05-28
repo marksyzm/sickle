@@ -1,14 +1,18 @@
 <img src="https://raw.githubusercontent.com/marksyzm/sickle/master/design/sickle.png" alt="Sickle" />
 
 [![Build Status](https://travis-ci.org/marksyzm/sickle.svg?branch=master)](https://travis-ci.org/marksyzm/sickle)
-[![npm version](https://badge.fury.io/js/sickle@2x.png)](http://badge.fury.io/js/sickle)
+[![npm version](https://badge.fury.io/js/sickle.png)](http://badge.fury.io/js/sickle)
 
 All purpose image proxy for resizing, caching and output.
 
 Sickle.js is pretty simple - you set it up to store your files in a cache directory...
 
 ```javascript
-var sickle = new Sickle({ cacheDirectory: "./path/to/cache/directory" });
+var sickle = new Sickle({
+    scaleUp: false, // scale images up to required dimensions - defaults to false
+    quality: 90, //set quality of output - default is 90
+    cacheDirectory: "./path/to/cache/directory" // the directory in which to store your cache (must be writable)
+});
 ```
 
 then you send it a reachable URL via an object with these dimensions...
@@ -97,7 +101,7 @@ You can use the callback to retrieve an image object that outputs something like
 
 Holy farking schnit!
 
-Then... uh... that's it. The crop option resizes the image too, for laffs. 
+Then... uh... that's it. The crop option centers and crops the image within the dimensions too, for laffs.
 
 
 ## Dependencies
