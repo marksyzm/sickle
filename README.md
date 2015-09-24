@@ -108,7 +108,7 @@ Then... uh... that's it. The crop option centers and crops the image within the 
 GraphicsMagick
 
 ## Install
-`npm install sickle`
+`npm install sickle --save`
 
 ## Test
 Test it from the module directory via `npm test`
