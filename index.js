@@ -118,23 +118,19 @@ function resizeImage (filePath, requestData, data, options, cb) {
                     requestData.width = parseInt(requestData.width)
                 }
 
-
                 if(typeof(requestData.height) !== "undefined" && typeof(requestData.width) === "undefined" ){
                     var aspect = size.width / size.height;
                     requestData.width = aspect * requestData.height;
                 }
 
-
                 if(typeof(requestData.width) !== "undefined" && typeof(requestData.height) === "undefined" ){
                     var aspect = size.height / size.width;
                     requestData.height = aspect * requestData.width;
                 }
+                    // might be a good idea to add a maximum size param? Don't want to store people's 24mp images.
 
-                console.log("requestData is");
-                console.dir(requestData);
-
-                if (options.originalSize){
-                    // do nothing, we're not actually resizing
+                if (requestData.originalSize){
+                    // No need to resize at all
                 } else if (options.scaleUp || (!options.scaleUp && ( size.width > requestData.width || size.height > requestData.height)) ) {
                     this.quality(options.quality);
                     if (requestData.crop) {
@@ -179,7 +175,7 @@ function getImageMetadataAndBuffer (filePath, cb) {
 
 
 function getFilePath (requestData, options) {
-    if(options.originalSize){
+    if(requestData.originalSize){
         var cacheSubDirectory = "originalSize";
     } else {
         var cacheSubDirectory = requestData.width + "-" + requestData.height;
