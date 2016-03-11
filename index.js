@@ -16,7 +16,7 @@ var defaultOptions = {
          cacheMaxAge: 1000 * 60 * 60 * 24 * 100*/
     },
     defaultRequestData = {
-        url: null, width: 300, height: 300, crop: false
+        url: null, /*width: 800, height: 800,*/ crop: false
     },
     contentTypes = [ "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"],
     userAgent = "Sickle.js by marksyzm (ignore; Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36)";
@@ -108,7 +108,34 @@ function resizeImage (filePath, requestData, data, options, cb) {
                 var width, height;
                 var size = metadata.size;
 
-                if (options.scaleUp || (!options.scaleUp && ( size.width > requestData.width || size.height > requestData.height))) {
+
+                // This lets us use just a width or height if desired
+                if("height" in requestData){
+                    requestData.height = parseInt(requestData.height)
+                }
+
+                if("width" in requestData){
+                    requestData.width = parseInt(requestData.width)
+                }
+
+
+                if(typeof(requestData.height) !== "undefined" && typeof(requestData.width) === "undefined" ){
+                    var aspect = size.width / size.height;
+                    requestData.width = aspect * requestData.height;
+                }
+
+
+                if(typeof(requestData.width) !== "undefined" && typeof(requestData.height) === "undefined" ){
+                    var aspect = size.height / size.width;
+                    requestData.height = aspect * requestData.width;
+                }
+
+                console.log("requestData is");
+                console.dir(requestData);
+
+                if (options.originalSize){
+                    // do nothing, we're not actually resizing
+                } else if (options.scaleUp || (!options.scaleUp && ( size.width > requestData.width || size.height > requestData.height)) ) {
                     this.quality(options.quality);
                     if (requestData.crop) {
                         width = requestData.width;
@@ -152,7 +179,12 @@ function getImageMetadataAndBuffer (filePath, cb) {
 
 
 function getFilePath (requestData, options) {
-    var cacheSubDirectory = requestData.width + "-" + requestData.height;
+    if(options.originalSize){
+        var cacheSubDirectory = "originalSize";
+    } else {
+        var cacheSubDirectory = requestData.width + "-" + requestData.height;
+    }
+
     cacheSubDirectory += requestData.crop ? "-crop" : "-nocrop";
 
     return options.cacheDirectory + "/" + cacheSubDirectory + "/" + md5(requestData.url);
