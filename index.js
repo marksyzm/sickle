@@ -120,21 +120,17 @@ function resizeImage (filePath, requestData, data, options, cb) {
 
                 var aspect = size.width / size.height;
 
-                if(typeof(requestData.height) !== "undefined" && typeof(requestData.width) === "undefined" ){
-                    // var aspect = size.width / size.height;
+                if(typeof requestData.height === "number" && typeof requestData.width === "undefined" ){
+                    console.log(typeof requestData.height);
                     requestData.width = aspect * requestData.height;
                 }
 
-                if(typeof(requestData.width) !== "undefined" && typeof(requestData.height) === "undefined" ){
-                    // var aspect = size.height / size.width;
+                if(typeof requestData.width === "number" && typeof requestData.height === "undefined" ){
                     requestData.height =  requestData.width / aspect;
                 }
-                    // might be a good idea to add a maximum size param? Don't want to store people's 24mp images.
 
-                if (requestData.originalSize){
-                    console.log("orig");
-                    // No need to resize at all
-                } else if (options.scaleUp || (!options.scaleUp && ( size.width > requestData.width || size.height > requestData.height)) ) {
+                    // might be a good idea to add a maximum size param? Don't want to store people's 24mp images.
+                if(!requestData.originalSize && (options.scaleUp || (!options.scaleUp && ( size.width > requestData.width || size.height > requestData.height))) ) {
                     this.quality(options.quality);
                     if (requestData.crop) {
                         width = requestData.width;
@@ -179,6 +175,9 @@ function getImageMetadataAndBuffer (filePath, cb) {
 
 function getFilePath (requestData, options) {
     var cacheSubDirectory;
+    // If either height or width is undefined, then we get something
+    // like "undefined-300". But then again, maybe that's OK, since we're
+    // not defining that dimension.
     if(requestData.originalSize){
         cacheSubDirectory = "originalSize";
     } else {
