@@ -111,25 +111,28 @@ function resizeImage (filePath, requestData, data, options, cb) {
 
                 // This lets us use just a width or height if desired
                 if("height" in requestData){
-                    requestData.height = parseInt(requestData.height)
+                    requestData.height = parseInt(requestData.height);
                 }
 
                 if("width" in requestData){
-                    requestData.width = parseInt(requestData.width)
+                    requestData.width = parseInt(requestData.width);
                 }
 
+                var aspect = size.width / size.height;
+
                 if(typeof(requestData.height) !== "undefined" && typeof(requestData.width) === "undefined" ){
-                    var aspect = size.width / size.height;
+                    // var aspect = size.width / size.height;
                     requestData.width = aspect * requestData.height;
                 }
 
                 if(typeof(requestData.width) !== "undefined" && typeof(requestData.height) === "undefined" ){
-                    var aspect = size.height / size.width;
-                    requestData.height = aspect * requestData.width;
+                    // var aspect = size.height / size.width;
+                    requestData.height =  requestData.width / aspect;
                 }
                     // might be a good idea to add a maximum size param? Don't want to store people's 24mp images.
 
                 if (requestData.originalSize){
+                    console.log("orig");
                     // No need to resize at all
                 } else if (options.scaleUp || (!options.scaleUp && ( size.width > requestData.width || size.height > requestData.height)) ) {
                     this.quality(options.quality);
@@ -175,13 +178,16 @@ function getImageMetadataAndBuffer (filePath, cb) {
 
 
 function getFilePath (requestData, options) {
+    var cacheSubDirectory;
     if(requestData.originalSize){
-        var cacheSubDirectory = "originalSize";
+        cacheSubDirectory = "originalSize";
     } else {
-        var cacheSubDirectory = requestData.width + "-" + requestData.height;
+        cacheSubDirectory = requestData.width + "-" + requestData.height;
     }
 
     cacheSubDirectory += requestData.crop ? "-crop" : "-nocrop";
+    console.dir(requestData);
+    console.log("subdir is " + cacheSubDirectory+"\n\n\n\n");
 
     return options.cacheDirectory + "/" + cacheSubDirectory + "/" + md5(requestData.url);
 }
