@@ -121,7 +121,6 @@ function resizeImage (filePath, requestData, data, options, cb) {
                 var aspect = size.width / size.height;
 
                 if(typeof requestData.height === "number" && typeof requestData.width === "undefined" ){
-                    console.log(typeof requestData.height);
                     requestData.width = aspect * requestData.height;
                 }
 
@@ -185,8 +184,6 @@ function getFilePath (requestData, options) {
     }
 
     cacheSubDirectory += requestData.crop ? "-crop" : "-nocrop";
-    console.dir(requestData);
-    console.log("subdir is " + cacheSubDirectory+"\n\n\n\n");
 
     return options.cacheDirectory + "/" + cacheSubDirectory + "/" + md5(requestData.url);
 }
