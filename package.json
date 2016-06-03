@@ -1,6 +1,6 @@
 {
   "name": "sickle",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "All purpose image resizing, caching and output for Node.JS",
   "main": "index.js",
   "scripts": {
@@ -25,10 +25,10 @@
   },
   "homepage": "https://github.com/marksyzm/sickle",
   "dependencies": {
-    "MD5": "^1.2.1",
     "async": "^0.9.0",
     "gm": "^1.17.0",
     "lodash": "^3.5.0",
+    "md5": "^2.1.0",
     "mkdirp": "^0.5.0",
     "request": "^2.53.0"
   },

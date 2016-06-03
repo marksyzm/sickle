@@ -1,7 +1,7 @@
 "use strict";
 
 var _ = require("lodash"),
-    md5 = require("MD5"),
+    md5 = require("md5"),
     request = require("request"),
     fs = require("fs"),
     gm = require("gm"),
