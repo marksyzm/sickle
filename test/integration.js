@@ -1,7 +1,7 @@
 "use strict";
 
 var expect = require("chai").expect,
-    md5 = require("MD5");
+    md5 = require("md5");
 
 var Sickle = require("../"),
     support = require("./support");
