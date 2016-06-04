@@ -16,7 +16,7 @@ var defaultOptions = {
          cacheMaxAge: 1000 * 60 * 60 * 24 * 100*/
     },
     defaultRequestData = {
-        url: null, width: 300, height: 300, crop: false
+        url: null, /*width: 800, height: 800,*/ crop: false
     },
     contentTypes = [ "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"],
     userAgent = "Sickle.js by marksyzm (ignore; Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36)";
@@ -108,7 +108,28 @@ function resizeImage (filePath, requestData, data, options, cb) {
                 var width, height;
                 var size = metadata.size;
 
-                if (options.scaleUp || (!options.scaleUp && ( size.width > requestData.width || size.height > requestData.height))) {
+
+                // This lets us use just a width or height if desired
+                if("height" in requestData){
+                    requestData.height = parseInt(requestData.height);
+                }
+
+                if("width" in requestData){
+                    requestData.width = parseInt(requestData.width);
+                }
+
+                var aspect = size.width / size.height;
+
+                if(typeof requestData.height === "number" && typeof requestData.width === "undefined" ){
+                    requestData.width = aspect * requestData.height;
+                }
+
+                if(typeof requestData.width === "number" && typeof requestData.height === "undefined" ){
+                    requestData.height =  requestData.width / aspect;
+                }
+
+                    // might be a good idea to add a maximum size param? Don't want to store people's 24mp images.
+                if(!requestData.originalSize && (options.scaleUp || (!options.scaleUp && ( size.width > requestData.width || size.height > requestData.height))) ) {
                     this.quality(options.quality);
                     if (requestData.crop) {
                         width = requestData.width;
@@ -152,7 +173,16 @@ function getImageMetadataAndBuffer (filePath, cb) {
 
 
 function getFilePath (requestData, options) {
-    var cacheSubDirectory = requestData.width + "-" + requestData.height;
+    var cacheSubDirectory;
+    // If either height or width is undefined, then we get something
+    // like "undefined-300". But then again, maybe that's OK, since we're
+    // not defining that dimension.
+    if(requestData.originalSize){
+        cacheSubDirectory = "originalSize";
+    } else {
+        cacheSubDirectory = requestData.width + "-" + requestData.height;
+    }
+
     cacheSubDirectory += requestData.crop ? "-crop" : "-nocrop";
 
     return options.cacheDirectory + "/" + cacheSubDirectory + "/" + md5(requestData.url);
