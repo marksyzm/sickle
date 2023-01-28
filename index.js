@@ -51,7 +51,7 @@ function getRemoteImage (requestData, filePath, cb) {
     request.get({
         uri: requestData.url, encoding: null, headers: { "user-agent": userAgent }
     }, function (err, response, data) {
-        if (err) { return cb(new Error("Broken request")); }
+        if (err) { return cb(new Error(err)); }
         // check status codes
         if ([200,301,302].indexOf(response.statusCode) === -1) { return cb(new Error("Broken URL")); }
         // check if in range of valid content types
